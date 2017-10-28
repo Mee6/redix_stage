@@ -4,9 +4,10 @@ defmodule RedixStage.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    redis_url   = Plumbus.get_env("REDIS_URL", "redis://localhost", :string)
-    buffers_num = RedixStage.buffers_num()
-    workers_num = Plumbus.get_env("REDIX_STAGE_WORKER_NUM", buffers_num * 10, :integer)
+    redis_url          = Application.get_env(:redix_stage, :redis_url, "redis://localhost")
+    workers_multiplier = Application.get_env(:redix_stage, :workers_multiplier, 2)
+    buffers_num        = RedixStage.buffers_num()
+    workers_num        = buffers_num * workers_multiplier
 
     buffers =
       for i <- 0..buffers_num - 1 do
